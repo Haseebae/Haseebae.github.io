@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Haseeb Abdullah Kollorath</title>
+  <meta name="description" content="Agents, built for the hard part: I build and rigorously evaluate LLM agents for hard, long-horizon problems, and the systems they run on. Research staff at DREAM:Lab, IISc Bangalore.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #07080b;
+  --fg: #ecebe6;
+  --dim: #8d8c87;
+  --line: rgba(236, 235, 230, 0.12);
+  --card: rgba(236, 235, 230, 0.035);
+  --accent: #ff5a4e;
+  --sans: "Geist", system-ui, -apple-system, sans-serif;
+  --mono: "Geist Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Wallpaper: slow-drifting colour fields under a grain layer */
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60vw 50vh at 85% 0%, rgba(255, 90, 78, 0.22), transparent 70%),
+    radial-gradient(55vw 60vh at 0% 35%, rgba(64, 108, 255, 0.20), transparent 70%),
+    radial-gradient(70vw 50vh at 60% 100%, rgba(32, 180, 160, 0.14), transparent 70%),
+    var(--bg);
+  animation: drift 40s ease-in-out infinite alternate;
+}
+
+.wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+}
+
+/* Cursor glow: a soft light that trails the mouse, behind the content */
+.cursor-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 90, 78, 0.13), rgba(64, 108, 255, 0.05) 40%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity .4s;
+  will-change: transform;
+}
+.cursor-glow.on { opacity: 1; }
+main, footer { position: relative; z-index: 1; }
+@media (hover: none) { .cursor-glow { display: none; } }
+
+@keyframes drift {
+  from { filter: hue-rotate(0deg); transform: scale(1); }
+  to { filter: hue-rotate(-18deg); transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallpaper { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--line); transition: border-color .2s, color .2s; }
+a:hover { border-color: var(--accent); }
+
+/* Top bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px clamp(16px, 4vw, 40px);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(to bottom, rgba(7, 8, 11, 0.75), rgba(7, 8, 11, 0));
+}
+.topbar a { border: 0; }
+.mark span { color: var(--dim); margin-left: 8px; }
+.topbar nav { display: flex; gap: 22px; align-items: center; }
+.topbar nav a:not(.pill) { color: var(--dim); }
+.topbar nav a:not(.pill):hover { color: var(--fg); }
+.pill {
+  background: var(--accent);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+/* Content column */
+main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 24px);
+}
+
+section { padding: 56px 0; border-top: 1px solid var(--line); }
+section.hero { border-top: 0; padding: 16vh 0 72px; }
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  margin-bottom: 28px;
+}
+.label::before { content: "● "; color: var(--accent); }
+
+h1 {
+  font-size: clamp(44px, 9vw, 96px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  margin-bottom: 36px;
+}
+h1 .dim { color: var(--dim); }
+
+.lede { font-size: clamp(18px, 2.2vw, 22px); max-width: 680px; color: #d6d5cf; }
+.lede strong { font-weight: 500; color: var(--fg); }
+
+.cta {
+  margin-top: 36px;
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.cta a { color: var(--accent); border-color: rgba(255, 90, 78, 0.4); white-space: nowrap; }
+
+.now {
+  margin-top: 28px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--dim);
+}
+.now a { color: var(--fg); }
+
+.links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.links a {
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 14px;
+}
+.links a:hover { border-color: var(--accent); }
+
+/* Approach */
+.thesis {
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 760px;
+  margin-bottom: 48px;
+}
+.thesis .dim { color: var(--dim); }
+.pillars { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.pillars .num { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.pillars h3 { font-weight: 500; font-size: 18px; margin: 6px 0 8px; }
+.pillars p { color: #c9c8c2; font-size: 15.5px; }
+
+/* Use cases */
+.intro { color: #c9c8c2; max-width: 640px; margin: -12px 0 32px; }
+.group { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); margin: 40px 0 14px; }
+.cases { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.case {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.case.wide { grid-column: 1 / -1; }
+.case { position: relative; transition: border-color .3s; }
+.case::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 90, 78, 0.10), transparent 65%);
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+.case:hover { border-color: rgba(255, 90, 78, 0.35); }
+.case:hover::before { opacity: 1; }
+.tag { font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
+.case h3 { font-weight: 500; font-size: 18px; line-height: 1.3; }
+.case p { color: #c9c8c2; font-size: 15.5px; }
+.case .result { font-family: var(--mono); font-size: 12.5px; color: var(--fg); margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--line); }
+.case .used { font-family: var(--mono); font-size: 12px; color: var(--dim); }
+
+/* Entry lists */
+.entries { list-style: none; display: grid; gap: 34px; }
+.entries.compact { gap: 22px; }
+.entries > li { display: grid; grid-template-columns: 130px 1fr; gap: 20px; }
+.when { font-family: var(--mono); font-size: 12px; color: var(--dim); padding-top: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+.title { font-weight: 500; font-size: 18px; border-bottom: 0; }
+a.title { border-bottom: 1px solid var(--line); }
+.meta { font-family: var(--mono); font-size: 12.5px; color: var(--dim); margin: 4px 0 8px; }
+.entries p:not(.meta) { color: #c9c8c2; }
+.bullets { list-style: none; display: grid; gap: 8px; margin-top: 10px; color: #c9c8c2; }
+.bullets li { padding-left: 18px; position: relative; }
+.bullets li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+.bullets b { font-weight: 500; color: var(--fg); }
+.muted { color: var(--dim); }
+
+/* Stack */
+.stack { list-style: none; display: grid; gap: 18px; }
+.stack > li { display: grid; grid-template-columns: 130px 1fr; gap: 20px; align-items: baseline; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--card);
+  color: #d6d5cf;
+}
+
+footer {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 40px clamp(16px, 4vw, 24px) 64px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .pillars, .cases { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 16px; }
+  .topbar nav a:not(.pill) { display: none; }
+  .entries > li { grid-template-columns: 1fr; gap: 4px; }
+  .stack > li { grid-template-columns: 1fr; gap: 6px; }
+  section.hero { padding-top: 12vh; }
+}
+  </style>
+</head>
+<body>
+  <div class="wallpaper" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="mark" href="#top">HAK<span>©2026</span></a>
+    <nav>
+      <a href="#use-cases">Use cases</a>
+      <a href="#research">Research</a>
+      <a href="#experience">Experience</a>
+      <a href="#stack">Stack</a>
+      <a href="#talks">Talks</a>
+      <a class="pill" href="mailto:haseeb.kollorath@gmail.com">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="label">Haseeb Abdullah Kollorath · Bangalore</p>
+      <h1>Agents, built for<br><span class="dim">the hard part.</span></h1>
+      <p class="lede">I build agents for problems that don't fit in a demo: <strong>coding agents that train ML models for hours</strong>, <strong>research agents that tune federated learning on Raspberry Pis for microgrid power forecasting</strong>, and <strong>security agents that triage live SOC incidents</strong>. Each one needed its own definition of "working", its own evaluation, and infrastructure that wouldn't fall over mid-run. That's the part I own.</p>
+      <p class="cta">Solving complex problems with agents? <a href="mailto:haseeb.kollorath@gmail.com">Let's talk →</a></p>
+      <p class="now">Research staff at <a href="https://dream-lab.in">DREAM:Lab, IISc</a> · with IBM Research · previously led projects at Harman DTS (now Wipro)</p>
+      <div class="links">
+        <a href="https://github.com/Haseebae">GitHub</a>
+        <a href="https://linkedin.com/in/haseeba3">LinkedIn</a>
+        <a href="https://arxiv.org/abs/2601.14735">arXiv</a>
+        <a href="mailto:haseeb.kollorath@gmail.com">Email</a>
+      </div>
+    </section>
+
+    <section id="approach">
+      <h2 class="label">Why work with me</h2>
+      <p class="thesis">Using agents is easy. <span class="dim">Evaluating them, and the systems they run on, is hard, and what "good" means changes from one application to the next.</span></p>
+      <ol class="pillars">
+        <li>
+          <span class="num">01</span>
+          <h3>A research mindset</h3>
+          <p>I formalise the problem before building, benchmark against public baselines, and read agent traces rather than stopping at a leaderboard score. Claims come with reproducible experiments.</p>
+        </li>
+        <li>
+          <span class="num">02</span>
+          <h3>End-to-end ownership</h3>
+          <p>Problem statement, agent, tool environment, infrastructure, evaluation, and then the paper or the production deploy. Tech lead on four production agents at Harman; first author on FAME.</p>
+        </li>
+        <li>
+          <span class="num">03</span>
+          <h3>Systems foundations</h3>
+          <p>Serverless orchestration on AWS, FSDP and DeepSpeed training, Spark over 4&nbsp;TB of Common Crawl, federated learning on real edge hardware. Agents are distributed systems, and I treat them that way.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="use-cases">
+      <h2 class="label">Where I've taken agents</h2>
+      <p class="intro">Every benchmark is a different kind of hard. Here's what each one stress-tested, and where I've run agents outside a benchmark.</p>
+
+      <p class="group">Benchmarks &amp; research workloads</p>
+      <ul class="cases">
+        <li class="case wide">
+          <span class="tag">MLE-Bench · coding &amp; ML-training agents</span>
+          <h3>Autonomous ML engineering that runs for hours</h3>
+          <p>Agents (MLZero) that write, run and debug Kaggle-style training code inside a coding sandbox I built and managed. Tool calls that block for minutes to hours break synchronous serverless orchestration, so FAME checkpoints agent and orchestrator state and resumes on callback without billing idle waits.</p>
+          <p class="result">Completes every iteration where Step Functions time out · 3.64–4.24× cheaper than AWS Durable Functions (agent level), 2.67–8.23× (orchestrator level)</p>
+        </li>
+        <li class="case">
+          <span class="tag">Microgrid power forecasting · research agents</span>
+          <h3>Agents that tune federated learning on real devices</h3>
+          <p>LLM-guided evolutionary search (OpenEvolve, AdaEvolve, Auto-FL-Research) tuning ML and systems knobs jointly, on Raspberry Pis, Jetsons and in simulation. The hard part: the sim-to-real gap, and cost-to-good-enough vs. cost-to-best.</p>
+          <p class="used">Also AIITS traffic analytics and CIFAR-100 · first author, in prep. with IBM Research</p>
+        </li>
+        <li class="case">
+          <span class="tag">LiveMCPBench · tool use at scale</span>
+          <h3>Agents picking from hundreds of live MCP tools</h3>
+          <p>Long tool outputs bloat context and cost. I cut MCP overhead with S3 handle passing and tool-output caching, and mapped ReAct, Reflexion and LLM Compiler onto stateless functions.</p>
+          <p class="used">Used in FAME (TSC, under review) and ICWS 2026</p>
+        </li>
+        <li class="case">
+          <span class="tag">τ-bench · conversational agents</span>
+          <h3>Multi-turn agents under policy, with simulated users</h3>
+          <p>Retail and airline customer-service tasks where the agent must hold state across a conversation and follow domain rules. A sharp test of running stateful agents on stateless infrastructure.</p>
+          <p class="used">Used in FAME, ICWS 2026 and the durability work</p>
+        </li>
+        <li class="case">
+          <span class="tag">GAIA · general assistants</span>
+          <h3>Durability when the plan is decided at runtime</h3>
+          <p>Workflow engines assume a known graph; real agents choose their next step on the fly. I built the public baselines and am designing the durability guarantees these dynamic workflows need.</p>
+          <p class="used">In preparation</p>
+        </li>
+      </ul>
+
+      <p class="group">In production</p>
+      <ul class="cases">
+        <li class="case">
+          <span class="tag">Security operations</span>
+          <h3>SOC incident-triage copilot</h3>
+          <p>Agent over Microsoft Sentinel and MISP, grounded in MITRE ATT&amp;CK, with RBAC on what it could read and act on. Its memory limits on long triage sessions are what led me to FAME.</p>
+          <p class="result">40% faster incident response · tech lead</p>
+        </li>
+        <li class="case">
+          <span class="tag">Document intelligence</span>
+          <h3>Invoice extraction with a fine-tuned VLM</h3>
+          <p>Qwen2.5-VL 3B with 4-bit QLoRA on a single A40, inside a multi-agent extraction and validation pipeline (Ray OCR, Prefect).</p>
+          <p class="result">78% F1, +14% over base, from 279 training samples · tech lead</p>
+        </li>
+        <li class="case">
+          <span class="tag">Healthcare analytics</span>
+          <h3>Human-in-the-loop hypothesis validation</h3>
+          <p>Agent that writes and runs Pandas/NumPy code in a sandbox, streams its reasoning, and asks the user to resolve ambiguous assumptions before concluding.</p>
+          <p class="result">50+ medical hypotheses validated · tech lead</p>
+        </li>
+        <li class="case">
+          <span class="tag">Regulatory authoring</span>
+          <h3>Hybrid RAG for ICH clinical guidelines</h3>
+          <p>Dense + sparse retrieval on Qdrant with query routing, gold-standard retrieval evals, and a reranker bake-off (cross-encoder, ColBERT, LLM).</p>
+          <p class="result">25% less manual effort · 30% fewer authoring errors</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="research">
+      <h2 class="label">Research</h2>
+      <ol class="entries">
+        <li>
+          <span class="when">Under review</span>
+          <div>
+            <a class="title" href="https://arxiv.org/abs/2601.14735">FAME: QoS-aware Async Service Orchestration for Agentic Workflows</a>
+            <p class="meta">First author · Under review, IEEE Transactions on Services Computing</p>
+            <p>Long-running agents on short-lived serverless functions. MCP tool calls that block for minutes to hours are handled asynchronously: agent and orchestrator state is checkpointed and resumed from callbacks, without paying for idle waits. 3.6–4.2× cheaper than AWS Durable Functions on MLE-Bench workloads.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">ICWS 2026</span>
+          <div>
+            <span class="title">Optimizing FaaS Platforms for Orchestrating MCP-enabled Agentic Workflows</span>
+            <p class="meta">Accepted · with V. Kulkarni et al.</p>
+            <p>Maps ReAct, Reflexion and LLM Compiler onto stateless functions. 8–12× cheaper than VMs and up to 17× lower latency than managed agent runtimes.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">In preparation</span>
+          <div>
+            <span class="title">Evolutionary Research Agents for Tuning Federated Learning on Real Devices</span>
+            <p class="meta">First author · with IBM Research</p>
+            <p>LLM-guided evolutionary search (OpenEvolve, AdaEvolve) for joint ML and systems tuning across simulated and physical federations of Raspberry Pis and Jetsons.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">In preparation</span>
+          <div>
+            <span class="title">Durability guarantees for dynamic agentic workflows</span>
+            <p class="meta">Baselines on GAIA and τ-bench</p>
+            <p>What durability means when an agent's workflow graph is only decided at runtime.</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">HiPC SRS 2026</span>
+          <div>
+            <span class="title">Engine-Dependent Configuration Tuning of Federated Learning on Edge Devices</span>
+            <p class="meta">Under review · mentored two B.Tech authors</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="experience">
+      <h2 class="label">Experience</h2>
+      <ol class="entries">
+        <li>
+          <span class="when">Jan 2026 —</span>
+          <div>
+            <span class="title">Project Associate II (Research Staff)</span>
+            <p class="meta">DREAM:Lab, CDS, IISc Bangalore · Advisor: Prof. Yogesh Simmhan</p>
+            <ul class="bullets">
+              <li>Part of the lab's Agentic cloud research group; led FAME and currently leading the FL-tuning work, both in collaboration with IBM Research.</li>
+              <li>Formalise problems, build long-horizon agents and their tool environments, and benchmark them against baselines on MLE-Bench, LiveMCPBench, τ-bench and GAIA.</li>
+              <li>Mentored two B.Tech students on Optuna-driven FL tuning across Flower and Flotilla on an 8-node Raspberry Pi testbed (HiPC SRS 2026, under review).</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <span class="when">Aug — Dec 2026</span>
+          <div>
+            <span class="title">Project Mentor &amp; Guest Lecturer, DS252 Cloud Computing</span>
+            <p class="meta">IISc · Prof. Yogesh Simmhan</p>
+            <ul class="bullets">
+              <li>Mentoring two student teams through the term: working out the systems problem behind each app (scale, cost, state) and choosing cloud services to match.</li>
+              <li>Guest lecture on FaaS and FaaS workflows across hybrid clouds.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <span class="when">Jan — Apr 2026</span>
+          <div>
+            <span class="title">Teaching Assistant, DS256 Scalable Systems for Data Science</span>
+            <p class="meta">IISc · Prof. Yogesh Simmhan</p>
+            <ul class="bullets">
+              <li><b>Pre-training data:</b> Spark pipelines to process and clean 4&nbsp;TB of Common Crawl for language-model pre-training on compute-constrained HDFS clusters.</li>
+              <li><b>Distributed SLM training:</b> pre-trained a 50M-parameter language model with DeepSpeed on a multi-node SLURM cluster, comparing ZeRO stages under strict GPU budgets.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <span class="when">Jan 2024 — Jan 2026</span>
+          <div>
+            <span class="title">Associate Data Scientist, Harman DTS (now Wipro)</span>
+            <p class="meta">AI/ML Department · Bangalore</p>
+            <ul class="bullets">
+              <li><b>SecOps Copilot (tech lead):</b> incident-triage agent over Microsoft Sentinel and MISP, grounded in MITRE ATT&amp;CK, with RBAC; cut incident response time by 40%.</li>
+              <li><b>Invoice processing (tech lead):</b> fine-tuned Qwen2.5-VL 3B with QLoRA to 78% F1 (+14%); set up multi-GPU SFT with FSDP; multi-agent extraction pipeline on Ray and Prefect.</li>
+              <li><b>Analytical agent (tech lead):</b> human-in-the-loop code-executing agent in a secure sandbox; validated 50+ medical hypotheses.</li>
+              <li><b>Regulatory authoring:</b> adaptive hybrid RAG for ICH guidelines; 25% less manual effort, 30% fewer errors.</li>
+              <li><b>Rising Star Innovation Award</b> (Sep 2025) for client opportunities created through multi-agent R&amp;D.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <span class="when">2020 — 24</span>
+          <div>
+            <span class="title">B.Tech, Computer Science (AI &amp; ML)</span>
+            <p class="meta">Jain University, Bangalore · Distinction · CGPA 9.05/10</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="stack">
+      <h2 class="label">Stack</h2>
+      <ul class="stack">
+        <li>
+          <span class="when">Agent benchmarks</span>
+          <div class="chips"><span>MLE-Bench</span><span>LiveMCPBench</span><span>τ-bench</span><span>GAIA</span></div>
+        </li>
+        <li>
+          <span class="when">Agents &amp; LLMs</span>
+          <div class="chips"><span>MCP</span><span>LangGraph</span><span>LangChain</span><span>OpenEvolve</span><span>AdaEvolve (SkyDiscover)</span><span>Auto-FL-Research</span><span>Ollama</span><span>Hugging Face</span></div>
+        </li>
+        <li>
+          <span class="when">Training &amp; distributed</span>
+          <div class="chips"><span>PyTorch</span><span>QLoRA</span><span>FSDP</span><span>DeepSpeed (ZeRO)</span><span>Spark</span><span>HDFS</span><span>SLURM</span><span>Ray</span><span>Prefect</span><span>Docker</span><span>Kubernetes</span></div>
+        </li>
+        <li>
+          <span class="when">Cloud</span>
+          <div class="chips"><span>AWS Lambda</span><span>Step Functions</span><span>Durable Functions</span><span>EC2</span><span>DynamoDB</span><span>S3</span><span>SQS</span><span>GCP</span></div>
+        </li>
+        <li>
+          <span class="when">Backend &amp; data</span>
+          <div class="chips"><span>FastAPI</span><span>PostgreSQL</span><span>MongoDB</span><span>Qdrant</span><span>Neo4j</span></div>
+        </li>
+        <li>
+          <span class="when">FL &amp; edge</span>
+          <div class="chips"><span>Flower</span><span>Flotilla</span><span>Optuna</span><span>Raspberry Pi</span><span>NVIDIA Jetson</span></div>
+        </li>
+        <li>
+          <span class="when">Security</span>
+          <div class="chips"><span>MITRE ATT&amp;CK</span><span>Microsoft Sentinel</span><span>MISP</span><span>RBAC</span></div>
+        </li>
+        <li>
+          <span class="when">Languages</span>
+          <div class="chips"><span>Python</span><span>C++</span><span>C</span><span>Java</span><span>SQL</span></div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="talks">
+      <h2 class="label">Talks &amp; Workshops</h2>
+      <ol class="entries compact">
+        <li>
+          <span class="when">Aug — Dec 2026</span>
+          <div>
+            <span class="title">FaaS and FaaS workflows across hybrid clouds</span>
+            <p class="meta">Guest lecture · DS252 Cloud Computing, IISc</p>
+          </div>
+        </li>
+        <li>
+          <span class="when">Jun 2026</span>
+          <div>
+            <span class="title">Agents on the Edge</span>
+            <p class="meta">Invited talk · Systems for ML Workshop, ACM IISc Student Chapter · pan-India event, 100+ attendees</p>
+            <p>Built a local-model variant of an open-source Pokémon Emerald agent harness and benchmarked local vs. cloud LLMs per agent component.</p>
+          </div>
+        </li>
+        <!-- TODO: add IISc infra / paper deep-dive talks (title, venue, date, slides link) -->
+        <li>
+          <span class="when">2025</span>
+          <div>
+            <span class="title">Agent Development Workshops &amp; Knowledge sessions</span>
+            <p class="meta">Instructor &amp; AI mentor · Harman DTS · 100+ engineers</p>
+            <p>Live sessions on agent behaviour, multi-agent systems, document extraction, VLM fine-tuning and deployment.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="projects">
+      <h2 class="label">Projects</h2>
+      <ol class="entries compact">
+        <li>
+          <span class="when">2025</span>
+          <div>
+            <span class="title">PokeAgent</span>
+            <p class="meta">NeurIPS / Google DeepMind PokeAgent Challenge · extended the <a href="https://arxiv.org/abs/2605.09998">Continual Harness</a> agent with HTN and A* planning over a Neo4j game-knowledge graph</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section id="writing">
+      <h2 class="label">Writing</h2>
+      <p class="muted">Coming soon.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Haseeb Abdullah Kollorath · <a href="mailto:haseeb.kollorath@gmail.com">haseeb.kollorath@gmail.com</a></p>
+    <p class="muted">Last updated Nov 2026</p>
+  </footer>
+
+  <script>
+    // Page glow follows the mouse; cards light up where the pointer is.
+    (() => {
+      const glow = document.querySelector('.cursor-glow');
+      let x = 0, y = 0, queued = false;
+      window.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        x = e.clientX; y = e.clientY;
+        glow.classList.add('on');
+        if (!queued) {
+          queued = true;
+          requestAnimationFrame(() => {
+            glow.style.transform = `translate(${x}px, ${y}px)`;
+            queued = false;
+          });
+        }
+        const card = e.target.closest && e.target.closest('.case');
+        if (card) {
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          card.style.setProperty('--my', `${e.clientY - r.top}px`);
+        }
+      });
+      document.addEventListener('pointerleave', () => glow.classList.remove('on'));
+    })();
+  </script>
+</body>
+</html>
