@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Haseeb Abdullah Kollorath</title>
-  <meta name="description" content="Agents, built for the hard part: I build and rigorously evaluate LLM agents for hard, long-horizon problems, and the systems they run on. Research staff at DREAM:Lab, IISc Bangalore.">
+  <meta name="description" content="Agents, built for the hard part: I build and rigorously evaluate LLM agents for hard, long-horizon problems, and the systems that keep them reliable. Research staff at DREAM:Lab, IISc Bangalore.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -301,7 +301,8 @@ footer {
       <p class="label">Haseeb Abdullah Kollorath · Bangalore</p>
       <h1>Agents, built for<br><span class="dim">the hard part.</span></h1>
       <p class="lede">I build agents for problems that don't fit in a demo: <strong>coding agents that train ML models for hours</strong>, <strong>research agents that tune federated learning on Raspberry Pis for microgrid power forecasting</strong>, and <strong>security agents that triage live SOC incidents</strong>. Each one needed its own definition of "working", its own evaluation, and infrastructure that wouldn't fall over mid-run. That's the part I own.</p>
-      <p class="cta">Solving complex problems with agents? <a href="mailto:haseeb.kollorath@gmail.com">Let's talk →</a></p>
+      <p class="cta">Working on agents or the systems under them? <a href="mailto:haseeb.kollorath@gmail.com">Get in touch →</a></p>
+      <p class="now">Research: reliability and cost of long-running agents on serverless and edge systems, and bringing established systems techniques to new workloads.</p>
       <p class="now">Research staff at <a href="https://dream-lab.in">DREAM:Lab, IISc</a> · with IBM Research · previously led projects at Harman DTS (now Wipro)</p>
       <div class="links">
         <a href="https://github.com/Haseebae">GitHub</a>
@@ -312,7 +313,7 @@ footer {
     </section>
 
     <section id="approach">
-      <h2 class="label">Why work with me</h2>
+      <h2 class="label">Approach</h2>
       <p class="thesis">Using agents is easy. <span class="dim">Evaluating them, and the systems they run on, is hard, and what "good" means changes from one application to the next.</span></p>
       <ol class="pillars">
         <li>
@@ -366,8 +367,8 @@ footer {
         <li class="case">
           <span class="tag">GAIA · general assistants</span>
           <h3>Durability when the plan is decided at runtime</h3>
-          <p>Workflow engines assume a known graph; real agents choose their next step on the fly. I built the public baselines and am designing the durability guarantees these dynamic workflows need.</p>
-          <p class="used">In preparation</p>
+          <p>Workflow engines assume a known graph; real agents choose their next step on the fly. A write-ahead log and idempotent tool effects keep recovery correct wherever a crash lands. I contributed to identifying the right recovery protocols and benchmarked the cloud baselines.</p>
+          <p class="used">Durability work · third author, in preparation</p>
         </li>
       </ul>
 
@@ -431,8 +432,8 @@ footer {
           <span class="when">In preparation</span>
           <div>
             <span class="title">Durability guarantees for dynamic agentic workflows</span>
-            <p class="meta">Baselines on GAIA and τ-bench</p>
-            <p>What durability means when an agent's workflow graph is only decided at runtime.</p>
+            <p class="meta">Third author</p>
+            <p>Crash consistency for agents whose workflow graph is only decided at runtime: each decision is committed to a write-ahead log before work is dispatched, tool effects carry idempotency keys, and crashes are injected at every point between commit and acknowledgement. I contributed to identifying the right recovery protocols and benchmarked the cloud baselines.</p>
           </div>
         </li>
         <li>
@@ -585,11 +586,6 @@ footer {
           </div>
         </li>
       </ol>
-    </section>
-
-    <section id="writing">
-      <h2 class="label">Writing</h2>
-      <p class="muted">Coming soon.</p>
     </section>
   </main>
 
